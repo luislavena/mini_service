@@ -1,2 +1,4 @@
 *.itProject
 *.sublime-project
+*.o
+*.a
