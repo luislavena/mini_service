@@ -11,3 +11,20 @@ namespace "lib" do
     library "user32", "advapi32"
   end
 end
+
+namespace "examples" do
+  task "build" => ["lib:build"]
+  project_task "basic" do
+    executable  "basic"
+    build_to    "examples"
+
+    search_path "inc"
+    lib_path    "lib/win32"
+
+    main        "examples/basic.bas"
+
+    library     "mini_service"
+  end
+end
+
+task :clobber => ["lib:clobber", "examples:clobber"]
