@@ -9,6 +9,8 @@ namespace "lib" do
     source "src/mini_service.bas"
 
     library "user32", "advapi32"
+
+    option :pedantic => true
   end
 end
 
@@ -24,6 +26,8 @@ namespace "examples" do
     main        "examples/basic.bas"
 
     library     "mini_service"
+
+    option :pedantic => true
   end
 end
 
