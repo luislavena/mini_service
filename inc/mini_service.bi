@@ -12,12 +12,12 @@ type MiniService
     Stopped = SERVICE_STOPPED
   end enum
 
-  declare constructor(as string)
+  declare constructor(byref as string)
   declare destructor()
 
   '# methods
   declare sub run()
-  declare sub ping(as integer)
+  declare sub ping(byval as integer)
 
   '# properties (read-only)
   declare property name           as string
@@ -26,11 +26,11 @@ type MiniService
 
   '# event callbacks
   '# required:
-  onStart   as sub(as MiniService)
+  onStart   as sub(byval as MiniService ptr)
 
   '# optional:
-  onInit    as sub(as MiniService)
-  onStop    as sub(as MiniService)
+  onInit    as sub(byval as MiniService ptr)
+  onStop    as sub(byval as MiniService ptr)
 
   '# use this to store any extra reference (pseudo inheritance)
   extra     as any ptr
