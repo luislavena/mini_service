@@ -6,7 +6,7 @@
 
 type MiniService
   '# possible service states
-  enum StateEnum
+  enum States
     Running = SERVICE_RUNNING
     Paused  = SERVICE_PAUSED
     Stopped = SERVICE_STOPPED
@@ -22,7 +22,7 @@ type MiniService
   '# properties (read-only)
   declare property name           as string
   declare property command_line   as string
-  declare property state          as StateEnum
+  declare property state          as States
 
   '# event callbacks
   '# required:

@@ -9,7 +9,7 @@ type BasicService
 private:
   _service as MiniService ptr
 
-  declare static sub onStart(as MiniService)
+  declare static sub onStart(byval as MiniService ptr)
 end type
 
 constructor BasicService()
@@ -28,9 +28,18 @@ sub BasicService.run()
   _service->run()
 end sub
 
-sub BasicService.onStart(service as MiniService)
-  var this = cast(BasicService ptr, service.extra)
+sub BasicService.onStart(byval service as MiniService ptr)
+  var this = cast(BasicService ptr, service->extra)
+
+  do while (service->state = MiniService.States.Running)
+    sleep 100
+  loop
+
 end sub
 
-dim service as BasicService
-service.run()
+sub main()
+  dim myservice as BasicService
+  myservice.run()
+end sub
+
+main()
