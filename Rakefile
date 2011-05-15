@@ -10,7 +10,7 @@ namespace "lib" do
 
     library "user32", "advapi32"
 
-    option :pedantic => true, :debug => true
+    option :mt => true, :pedantic => true, :debug => true
   end
 end
 
@@ -27,7 +27,7 @@ namespace "examples" do
 
     library     "mini_service"
 
-    option :pedantic => true, :debug => true
+    option :mt => true, :pedantic => true, :debug => true
   end
 end
 

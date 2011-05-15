@@ -4,6 +4,9 @@
 #include once "windows.bi"
 #inclib "advapi32"
 
+#define debug(msg) debug_file(msg)
+declare sub debug_file(byref as string)
+
 type MiniService
   '# possible service states
   enum States
@@ -36,6 +39,32 @@ type MiniService
   extra     as any ptr
 
 private:
+  '# singleton pattern
+  declare static function singleton(byval as MiniService ptr = 0) as MiniService ptr
+
+  '# Used by StartServiceCtrlDispatcher and SERVICE_TABLE_ENTRY
+  declare static sub control_dispatcher(byval as DWORD, byval as LPSTR ptr)
+  declare static function control_handler_ex(byval as DWORD, byval as DWORD, byval as LPVOID, byval as LPVOID) as DWORD
+
+  '# internal helpers
+  declare sub perform()
+  declare sub perform_stop()
+  declare sub build_command_line()
+  declare sub register_handler()
+  declare sub update_state(byval as DWORD, byval as integer = 0, byval as integer = 0)
+
+  '# internal thread helper (to confrom with threadcreate signature)
+  declare static sub invoke_onStart(byval as any ptr)
+
+  '# hold property values
+  _name as string
+  _state as States
+  _command_line as string
+
+  '# hold Service internals
+  status as SERVICE_STATUS
+  status_handle as SERVICE_STATUS_HANDLE
+  stop_event as HANDLE
 
 end type
 
