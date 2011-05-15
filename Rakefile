@@ -10,7 +10,7 @@ namespace "lib" do
 
     library "user32", "advapi32"
 
-    option :pedantic => true
+    option :pedantic => true, :debug => true
   end
 end
 
@@ -27,7 +27,7 @@ namespace "examples" do
 
     library     "mini_service"
 
-    option :pedantic => true
+    option :pedantic => true, :debug => true
   end
 end
 
@@ -35,3 +35,6 @@ task :build => ["lib:build", "examples:build"]
 task :clobber => ["lib:clobber", "examples:clobber"]
 
 task :default => [:build]
+task :run => [:build] do
+  sh "examples/basic"
+end
