@@ -117,6 +117,7 @@ sub MiniService.perform()
     end if
 
     '# now, we wait for our stop signal
+    debug("waiting for stop_event signaling")
     do
       '# do nothing ...
       '# but not too often!
@@ -160,6 +161,9 @@ function MiniService.control_handler_ex(byval dwControl as DWORD, byval dwEventT
 end function
 
 sub MiniService.perform_stop()
+  '# update status to reflect we are stopping
+  update_state(SERVICE_STOP_PENDING)
+
   '# invoke onStop if defined
   if not (onStop = 0) then
     debug("invoking onStop")
