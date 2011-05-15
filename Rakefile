@@ -1,5 +1,11 @@
 require File.expand_path("rakehelp/freebasic", File.dirname(__FILE__))
 
+defaults = {
+  :mt       => true,  # we require multithread
+  :pedantic => true,  # we like noisy warnings
+  :debug    => ENV["DEBUG"] ? true : false # optional debugging
+}
+
 namespace "lib" do
   project_task "mini_service" do
     lib "mini_service"
@@ -10,7 +16,7 @@ namespace "lib" do
 
     library "user32", "advapi32"
 
-    option :mt => true, :pedantic => true, :debug => true
+    option defaults
   end
 end
 
@@ -27,7 +33,7 @@ namespace "examples" do
 
     library     "mini_service"
 
-    option :mt => true, :pedantic => true, :debug => true
+    option defaults
   end
 end
 
