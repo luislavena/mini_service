@@ -43,6 +43,7 @@ namespace "examples" do
 end
 
 task :build => ["lib:build", "examples:build"]
+task :rebuild => ["lib:rebuild", "examples:rebuild"]
 task :clobber => ["lib:clobber", "examples:clobber"]
 
 task :default => [:build]
