@@ -39,6 +39,8 @@ module FreeBASIC
   ON_WINDOWS = (RUBY_PLATFORM =~ /mingw|mswin/)
 
   class ProjectTask
+    include Rake::DSL if defined?(Rake::DSL)
+
     attr_accessor :name
     attr_accessor :output_name
     attr_accessor :type
