@@ -4,11 +4,11 @@
 #include once "windows.bi"
 #inclib "advapi32"
 
-#ifdef _DEBUG_FILE
-declare sub debug_file(byref as string, byref as string, byval as integer, byref as string)
-#define debug(msg) debug_file(msg, __FILE__, __LINE__, __FUNCTION__)
+#ifdef _TRACE_FILE
+declare sub trace_file(byref as string, byref as string, byval as integer, byref as string)
+#define trace(msg) trace_file(msg, __FILE__, __LINE__, __FUNCTION__)
 #else
-#define debug(msg)
+#define trace(msg)
 #endif
 
 type MiniService

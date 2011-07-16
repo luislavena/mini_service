@@ -1,11 +1,11 @@
 #include once "mini_service.bi"
 
 constructor MiniService(byref new_name as string)
-  debug("setting up new name")
+  trace("setting up new name")
   _name = new_name
 
   '# initial service values
-  debug("initial service status values")
+  trace("initial service status values")
   with status
     .dwServiceType = SERVICE_WIN32_OWN_PROCESS
     .dwCurrentState = SERVICE_STOPPED
@@ -17,16 +17,16 @@ constructor MiniService(byref new_name as string)
   end with
 
   '# Initial state
-  debug("assigning an initial state as Stopped")
+  trace("assigning an initial state as Stopped")
   _state = Stopped
 
   '# create condition and mutex for synchronization
-  debug("creating stop event")
+  trace("creating stop event")
   stop_event = CreateEvent(0, FALSE, FALSE, 0)
 end constructor
 
 destructor MiniService()
-  debug("clean up after our party!")
+  trace("clean up after our party!")
   CloseHandle(stop_event)
 end destructor
 
@@ -38,7 +38,7 @@ function MiniService.singleton(byval new_value as MiniService ptr = 0) as MiniSe
   static _singleton as MiniService ptr
 
   if not (new_value = 0) then
-    debug("setting new singleton reference: " + hex(new_value))
+    trace("setting new singleton reference: " + hex(new_value))
     _singleton = new_value
   end if
 
@@ -48,13 +48,13 @@ end function
 sub MiniService.run()
   dim service_table(1) as SERVICE_TABLE_ENTRY
 
-  debug("about to run!")
+  trace("about to run!")
 
   '# track this instance as singleton
   MiniService.singleton(@this)
 
   '# build the service table and references
-  debug("setting up first entry in service_table for " + _name + " @ " + hex(@MiniService.control_dispatcher))
+  trace("setting up first entry in service_table for " + _name + " @ " + hex(@MiniService.control_dispatcher))
 
   service_table(0) = type<SERVICE_TABLE_ENTRY>( _
     strptr(_name), _
@@ -65,10 +65,10 @@ sub MiniService.run()
   service_table(1) = type<SERVICE_TABLE_ENTRY>(0, 0)
 
   '# start the control dispatcher with the list
-  debug("start service dispatcher")
+  trace("start service dispatcher")
   StartServiceCtrlDispatcher(@service_table(0))
 
-  debug("run() done")
+  trace("run() done")
 end sub
 
 sub MiniService.control_dispatcher(byval argc as DWORD, byval argv as LPSTR ptr)
@@ -86,7 +86,7 @@ end sub
 
 sub MiniService.register_handler()
 
-  debug("register control handler")
+  trace("register control handler")
   status_handle = RegisterServiceCtrlHandlerEx( _
     strptr(_name), _
     @control_handler_ex, _
@@ -99,12 +99,12 @@ sub MiniService.perform()
 
   '# got handle? good, let's proceed
   if not (status_handle = 0) then
-    debug("switch state to start pending")
+    trace("switch state to start pending")
     update_state(SERVICE_START_PENDING)
 
     '# perform onInit (if present)
     if not (onInit = 0) then
-      debug("invoking onInit")
+      trace("invoking onInit")
       onInit(@this)
     end if
 
@@ -112,30 +112,30 @@ sub MiniService.perform()
     update_state(SERVICE_RUNNING)
 
     if not (onStart = 0) then
-      debug("invoking onStart, on a worker thread")
+      trace("invoking onStart, on a worker thread")
       worker = threadcreate(@MiniService.invoke_onStart, @this)
     end if
 
     '# now, we wait for our stop signal
-    debug("waiting for stop_event signaling")
+    trace("waiting for stop_event signaling")
     do
       '# do nothing ...
       '# but not too often!
     loop while (WaitForSingleObject(stop_event, 100) = WAIT_TIMEOUT)
 
     '# now let's way for our thread to complete
-    debug("now wait for onStart to complete")
+    trace("now wait for onStart to complete")
     threadwait(worker)
 
     '# update status, we're done
-    debug("done, mark the service as stopped")
+    trace("done, mark the service as stopped")
     update_state(SERVICE_STOPPED)
   end if
 end sub
 
 sub MiniService.invoke_onStart(byval any_service as any ptr)
   var service = cast(MiniService ptr, any_service)
-  debug("calling onStart")
+  trace("calling onStart")
   service->onStart(service)
 end sub
 
@@ -143,14 +143,14 @@ function MiniService.control_handler_ex(byval dwControl as DWORD, byval dwEventT
   dim result as DWORD
   var service = cast(MiniService ptr, lpContext)
 
-  debug("about to process control signal")
+  trace("about to process control signal")
   select case dwControl
     case SERVICE_CONTROL_INTERROGATE:
-      debug("interrogate signal received")
+      trace("interrogate signal received")
       result = NO_ERROR
 
     case SERVICE_CONTROL_SHUTDOWN, SERVICE_CONTROL_STOP:
-      debug("stop or shutdown received, invoking perform_stop()")
+      trace("stop or shutdown received, invoking perform_stop()")
       service->perform_stop()
 
     case else:
@@ -166,27 +166,27 @@ sub MiniService.perform_stop()
 
   '# invoke onStop if defined
   if not (onStop = 0) then
-    debug("invoking onStop")
+    trace("invoking onStop")
     onStop(@this)
   end if
 
   '# now trigger stop_event
-  debug("triggering stop event")
+  trace("triggering stop event")
   SetEvent(stop_event)
 end sub
 
 sub MiniService.update_state(byval new_state as DWORD, byval checkpoint as integer = 0, byval waithint as integer = 0)
 
-  debug("adjusting service state")
+  trace("adjusting service state")
   select case new_state
     '# disable the option to accept other commands during pending operations
     case SERVICE_START_PENDING, SERVICE_STOP_PENDING:
-      debug("disabling commands during pending operations")
+      trace("disabling commands during pending operations")
       status.dwControlsAccepted = 0
 
     '# when running a service can accept stop or shutdown events
     case SERVICE_RUNNING:
-      debug("accept stop and shutdown when running")
+      trace("accept stop and shutdown when running")
       status.dwControlsAccepted = (SERVICE_ACCEPT_STOP or SERVICE_ACCEPT_SHUTDOWN)
   end select
 
@@ -200,7 +200,7 @@ sub MiniService.update_state(byval new_state as DWORD, byval checkpoint as integ
 
   '# use our handle to notify the status update
   if not (status_handle = 0) then
-    debug("notify windows using SetServiceStatus API")
+    trace("notify windows using SetServiceStatus API")
     SetServiceStatus(status_handle, @status)
   end if
 end sub
@@ -209,11 +209,11 @@ sub MiniService.build_command_line()
   dim as string result, token
   dim idx as integer
 
-  debug("commands passed to ImagePath (excluding executable):")
+  trace("commands passed to ImagePath (excluding executable):")
   idx = 1
   token = command(idx)
   do while (len(token) > 0)
-    debug("token: " + token)
+    trace("token: " + token)
 
     if (instr(token, chr(32)) > 0) then
       '# quote around parameter with spaces
@@ -229,12 +229,12 @@ sub MiniService.build_command_line()
 
   _command_line = result
 
-  debug("command line: " + _command_line)
+  trace("command line: " + _command_line)
 end sub
 
-'# DEBUG_FILE
-#ifdef _DEBUG_FILE
-sub debug_file(byref msg as string, byref f as string, byval l as integer, byref func as string)
+'# TRACE_FILE
+#ifdef _TRACE_FILE
+sub trace_file(byref msg as string, byref f as string, byval l as integer, byref func as string)
   dim handler as integer
 
   handler = freefile
