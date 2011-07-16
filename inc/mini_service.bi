@@ -4,8 +4,12 @@
 #include once "windows.bi"
 #inclib "advapi32"
 
-#define debug(msg) debug_file(msg)
-declare sub debug_file(byref as string)
+#ifdef _DEBUG_FILE
+declare sub debug_file(byref as string, byref as string, byval as integer, byref as string)
+#define debug(msg) debug_file(msg, __FILE__, __LINE__, __FUNCTION__)
+#else
+#define debug(msg)
+#endif
 
 type MiniService
   '# possible service states

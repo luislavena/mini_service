@@ -1,15 +1,20 @@
 require File.expand_path("rakehelp/freebasic", File.dirname(__FILE__))
 
 defaults = {
-  :mt       => true,  # we require multithread
-  :pedantic => true,  # we like noisy warnings
-  :debug    => ENV["DEBUG"] ? true : false # optional debugging
+  :mt       => true,          # we require multithread
+  :pedantic => true,          # noisy warnings
+  :trace    => ENV["TRACE"],  # generate a log file
+  :debug    => ENV["DEBUG"]   # optional debugging
 }
 
 namespace "lib" do
   project_task "mini_service" do
     lib "mini_service"
     build_to "lib/win32"
+
+    if defaults[:trace]
+      define "_DEBUG_FILE"
+    end
 
     search_path "inc"
     source "src/mini_service.bas"

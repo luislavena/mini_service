@@ -232,13 +232,15 @@ sub MiniService.build_command_line()
   debug("command line: " + _command_line)
 end sub
 
-'# DEBUG
-sub debug_file(byref msg as string)
+'# DEBUG_FILE
+#ifdef _DEBUG_FILE
+sub debug_file(byref msg as string, byref f as string, byval l as integer, byref func as string)
   dim handler as integer
 
   handler = freefile
-  open EXEPATH + "\service.log" for append as #handler
-  print #handler, msg
+  open EXEPATH + "\mini_service.log" for append as #handler
+  print #handler, f + ":" + str(l) + " (" + func + ") - " + msg
 
   close #handler
 end sub
+#endif
