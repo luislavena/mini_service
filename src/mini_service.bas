@@ -80,8 +80,8 @@ sub MiniService.control_dispatcher(byval argc as DWORD, byval argv as LPSTR ptr)
     '# register service control handler
     service->register_handler()
 
-    '# invoke all the hooks defined
-    service->perform()
+    '# carry on with all the hooks defined
+    service->execute()
 end sub
 
 sub MiniService.register_handler()
@@ -93,7 +93,7 @@ sub MiniService.register_handler()
     )
 end sub
 
-sub MiniService.perform()
+sub MiniService.execute()
     dim worker as any ptr
 
     '# got handle? good, let's proceed
@@ -103,7 +103,7 @@ sub MiniService.perform()
 
         '# perform onInit (if present)
         if not (onInit = 0) then
-            trace("invoking onInit")
+            trace("invoking onInit (sync)")
             onInit(@this)
         end if
 
@@ -111,7 +111,7 @@ sub MiniService.perform()
         update_state(SERVICE_RUNNING)
 
         if not (onStart = 0) then
-            trace("invoking onStart, on a worker thread")
+            trace("invoking onStart (thread)")
             worker = threadcreate(@MiniService.invoke_onStart, @this)
         end if
 
@@ -122,7 +122,7 @@ sub MiniService.perform()
             '# but not too often!
         loop while (WaitForSingleObject(stop_event, 100) = WAIT_TIMEOUT)
 
-        '# now let's way for our thread to complete
+        '# now let's wait for our thread to complete
         trace("now wait for onStart to complete")
         threadwait(worker)
 
@@ -150,7 +150,7 @@ function MiniService.control_handler_ex(byval dwControl as DWORD, byval dwEventT
 
     case SERVICE_CONTROL_SHUTDOWN, SERVICE_CONTROL_STOP:
         trace("stop or shutdown received, invoking perform_stop()")
-        service->perform_stop()
+        service->invoke_stop()
 
     case else:
         result = NO_ERROR
@@ -159,13 +159,13 @@ function MiniService.control_handler_ex(byval dwControl as DWORD, byval dwEventT
     return result
 end function
 
-sub MiniService.perform_stop()
+sub MiniService.invoke_stop()
     '# update status to reflect we are stopping
     update_state(SERVICE_STOP_PENDING)
 
     '# invoke onStop if defined
     if not (onStop = 0) then
-        trace("invoking onStop")
+        trace("invoking onStop (sync)")
         onStop(@this)
     end if
 
@@ -198,7 +198,7 @@ sub MiniService.update_state(byval new_state as DWORD, byval checkpoint as integ
 
     '# use our handle to notify the status update
     if not (status_handle = 0) then
-        trace("notify windows using SetServiceStatus API")
+        trace("notify Windows using SetServiceStatus API")
         SetServiceStatus(status_handle, @status)
     end if
 end sub

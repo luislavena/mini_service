@@ -51,8 +51,8 @@ private:
     declare static function control_handler_ex(byval as DWORD, byval as DWORD, byval as LPVOID, byval as LPVOID) as DWORD
 
     '# internal helpers
-    declare sub perform()
-    declare sub perform_stop()
+    declare sub execute()
+    declare sub invoke_stop()
     declare sub build_command_line()
     declare sub register_handler()
     declare sub update_state(byval as DWORD, byval as integer = 0, byval as integer = 0)
