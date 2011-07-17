@@ -1,4 +1,8 @@
 require File.expand_path("rakehelp/freebasic", File.dirname(__FILE__))
+require "rake/packagetask"
+
+PRODUCT_NAME = "mini_service"
+PRODUCT_VERSION = "0.1.0"
 
 defaults = {
   :mt       => true,                       # we require multithread
@@ -47,6 +51,13 @@ task :rebuild => ["lib:rebuild", "examples:rebuild"]
 task :clobber => ["lib:clobber", "examples:clobber"]
 
 task :default => [:build]
-task :run => [:build] do
-  sh "examples/basic"
+
+# Source code package
+Rake::PackageTask.new(PRODUCT_NAME, PRODUCT_VERSION) do |pkg|
+  pkg.need_zip = true
+  pkg.package_files = FileList[
+    "examples/*.bas", "inc/*.bi", "src/*.bas",
+    "README.md", "LICENSE.txt", "History.txt",
+    "rakehelp/freebasic.rb", "Rakefile"
+  ]
 end
