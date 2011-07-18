@@ -3,6 +3,7 @@ require "rake/packagetask"
 
 PRODUCT_NAME = "mini_service"
 PRODUCT_VERSION = "0.1.0"
+PRODUCT_RELEASE = "#{PRODUCT_NAME}-#{PRODUCT_VERSION}-win32.zip"
 
 defaults = {
   :mt       => true,                       # we require multithread
@@ -60,4 +61,35 @@ Rake::PackageTask.new(PRODUCT_NAME, PRODUCT_VERSION) do |pkg|
     "README.md", "LICENSE.txt", "History.txt",
     "rakehelp/freebasic.rb", "Rakefile"
   ]
+end
+
+desc "Build binary packages"
+task :release => ["pkg/#{PRODUCT_RELEASE}"]
+task :package => [:release]
+
+file "pkg/#{PRODUCT_RELEASE}" => ["lib:build", "pkg"] do |f|
+  zipfile = File.basename(f.name)
+  dirname = zipfile.gsub(File.extname(zipfile), "")
+
+  base    = File.join("pkg", dirname)
+  inc_dir = File.join(base, "inc")
+  lib_dir = File.join(base, "lib", "win32")
+  doc_dir = File.join(base, "docs", PRODUCT_NAME)
+  exa_dir = File.join(base, "examples", PRODUCT_NAME)
+
+  mkdir_p inc_dir
+  mkdir_p lib_dir
+  mkdir_p doc_dir
+  mkdir_p exa_dir
+
+  cp FileList["inc/*.bi"], inc_dir
+  cp FileList["lib/win32/*.a"], lib_dir
+  cp "examples/basic.bas", exa_dir
+  cp "README.md", doc_dir
+  cp "History.txt", doc_dir
+  cp "LICENSE.txt", doc_dir
+
+  chdir "pkg" do
+    sh "zip -r #{zipfile} #{dirname}"
+  end
 end
