@@ -2,7 +2,7 @@ require File.expand_path("rakehelp/freebasic", File.dirname(__FILE__))
 require "rake/packagetask"
 
 PRODUCT_NAME = "mini_service"
-PRODUCT_VERSION = "0.1.0"
+PRODUCT_VERSION = "0.1.1"
 PRODUCT_RELEASE = "#{PRODUCT_NAME}-#{PRODUCT_VERSION}-win32.zip"
 
 defaults = {
@@ -18,7 +18,7 @@ namespace "lib" do
     build_to "lib/win32"
 
     if defaults[:trace]
-      define "_TRACE_FILE"
+      define "_MINI_SERVICE_TRACE_FILE"
     end
 
     search_path "inc"

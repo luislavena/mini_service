@@ -231,9 +231,9 @@ sub MiniService.build_command_line()
 end sub
 
 '# TRACE_FILE
-#ifdef _TRACE_FILE
+#ifdef _MINI_SERVICE_TRACE_FILE
 
-sub trace_file(byref msg as string, byref f as string, byval l as integer, byref func as string)
+sub MiniService.trace_file(byref msg as string, byref f as string, byval l as integer, byref func as string)
     dim handler as integer
 
     handler = freefile

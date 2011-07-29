@@ -4,9 +4,8 @@
 #include once "windows.bi"
 #inclib "advapi32"
 
-#ifdef _TRACE_FILE
-    declare sub trace_file(byref as string, byref as string, byval as integer, byref as string)
-    #define trace(msg) trace_file(msg, __FILE__, __LINE__, __FUNCTION__)
+#ifdef _MINI_SERVICE_TRACE_FILE
+    #define trace(msg) MiniService.trace_file(msg, __FILE__, __LINE__, __FUNCTION__)
 #else
     #define trace(msg)
 #endif
@@ -49,6 +48,10 @@ private:
     '# Used by StartServiceCtrlDispatcher and SERVICE_TABLE_ENTRY
     declare static sub control_dispatcher(byval as DWORD, byval as LPSTR ptr)
     declare static function control_handler_ex(byval as DWORD, byval as DWORD, byval as LPVOID, byval as LPVOID) as DWORD
+
+#ifdef _MINI_SERVICE_TRACE_FILE
+    declare static sub trace_file(byref as string, byref as string, byval as integer, byref as string)
+#endif
 
     '# internal helpers
     declare sub execute()
