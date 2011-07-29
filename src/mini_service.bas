@@ -30,6 +30,14 @@ destructor MiniService()
     CloseHandle(stop_event)
 end destructor
 
+property MiniService.name() as string
+    return _name
+end property
+
+property MiniService.command_line() as string
+    return _command_line
+end property
+
 property MiniService.state() as States
     return _state
 end property
