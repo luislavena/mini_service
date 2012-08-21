@@ -1,5 +1,10 @@
 #include once "mini_service.bi"
 
+constructor MiniService()
+    '# default constructor as anonymous service
+    constructor("anonymous")
+end constructor
+
 constructor MiniService(byref new_name as string)
     trace("setting up new name")
     _name = new_name
