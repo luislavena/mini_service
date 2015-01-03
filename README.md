@@ -9,6 +9,15 @@ back in 2006.
 By today's standard, that code runs obsolete. New features added to FreeBASIC
 over the years could provide a better codebase.
 
+## Maintainer needed
+
+As January 1st, 2015, this project has become unmaintained.
+
+If you want to take over maintenance of this project, please [open an issue](issues) stating your intention and
+we can coordinate the entire process there.
+
+Thank you.
+
 ## Making things more simple
 
 This project aims to go back to basic, go to a simple and single purpose
